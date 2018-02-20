@@ -1,35 +1,48 @@
-import java.io.*;
-
 // Программа для теста на джуна для AIM Cunsulting
 // Нужно реализовать многопоточность при чтении таблиц
+
+import java.io.*;
+
 public class Main {
+    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
     public static void main(String[] args) {
         // Создаём или записываем в файл
-        String fileName = "";
+        for(;;) {
+            System.out.println("Enter file name(enter \"exit\" for quit): ");
 
-        File file = new File("1.csv");
-        String line = "";
+            String line = "";
+            String fileName = addFileName();
+            File file = new File(fileName + ".csv");
 
-        if (!file.exists()) try {
-            file.createNewFile();
-        } catch (IOException e) {
-            System.out.println("File not create.");
+            if(fileName.equals("exit")) break;
+
+            if (!file.exists()) try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Enter(enter \"close\" for ending): ");
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+                for(;!line.equals("close");) {
+                    line = br.readLine();
+
+                    if(line.equals("close")) break;
+
+                    String[] temp = line.split(";");
+
+                    bw.write(line + "\n\r");
+                    bw.flush();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        System.out.println("Enter: ");
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-             BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
-            do {
-                line = br.readLine();
-
-                if (line != null) bw.write(line);
-
-                bw.flush();
-            } while (!line.equals("q"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        clean(); // Закрываем потоки ввода
 
         // Создаём потоки для чтения
         Child child1 = new Child("Thread one");
@@ -41,5 +54,27 @@ public class Main {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void clean() {
+        try {
+            reader.close();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String addFileName() {
+        String name = "";
+
+        try {
+            name = reader.readLine();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return name;
     }
 }
