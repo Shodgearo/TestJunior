@@ -4,13 +4,13 @@ public class Child implements Runnable {
     Thread t;
 
     public Child(String name) {
-        this.name = name;
+        this.name = name; // Сохранаяем ссылку на строку в которой хранится имя файла
         t = new Thread(this);
         t.start();
     }
 
     @Override
     public void run() {
-        System.out.println(name + " starting and closing");
+
     }
 }
