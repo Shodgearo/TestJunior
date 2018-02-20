@@ -1,13 +1,17 @@
-// Программа для теста на джуна для AIM Cunsulting
+// Программа для теста на джуна для AIM Consulting
 // Нужно реализовать многопоточность при чтении таблиц
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) {
+        List<String> nameFiles = new ArrayList<>();
+        List<Child> children = new ArrayList<>();
         // Создаём или записываем в файл
         for(;;) {
             System.out.println("Enter file name(enter \"exit\" for quit): ");
@@ -17,6 +21,8 @@ public class Main {
             File file = new File(fileName + ".csv");
 
             if(fileName.equals("exit")) break;
+
+            nameFiles.add(fileName);
 
             if (!file.exists()) try {
                 file.createNewFile();
@@ -45,12 +51,14 @@ public class Main {
         clean(); // Закрываем потоки ввода
 
         // Создаём потоки для чтения
-        Child child1 = new Child("Thread one");
-        Child child2 = new Child("Thread two");
+        for (String nameFile : nameFiles) {
+            children.add(new Child(nameFile));
+        }
 
         try { // Ожидаем завершение потоков
-            child1.t.join();
-            child2.t.join();
+            for (Child child : children) {
+                child.t.join();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
